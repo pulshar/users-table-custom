@@ -1,8 +1,8 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useOnClickOutside } from "../hooks/useClickOutside";
-import { IoClose } from "react-icons/io5";
 import { motion } from "framer-motion";
+import { IoClose } from "react-icons/io5";
 import { Button } from "./ui/button";
 
 const animOverlay = {
@@ -23,11 +23,23 @@ const animDialog = {
   exit: { opacity: 0, scale: 0.95 },
 };
 
-export default function Modal({ title, toggleModal, children }) {
+export default function Modal({ title, onClose, children }) {
   const modalRef = useRef(null);
   useOnClickOutside(modalRef, () => {
-    toggleModal();
+    onClose();
   });
+
+  useEffect(() => {
+    const handleEscapeKey = (e) => {
+      if (e.code === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => document.removeEventListener("keydown", handleEscapeKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return createPortal(
     <motion.div
       variants={animOverlay}
@@ -35,7 +47,7 @@ export default function Modal({ title, toggleModal, children }) {
       animate="animate"
       exit="exit"
       role="dialog"
-      className="fixed inset-0 z-20 flex items-center justify-center bg-foreground/80 px-4 dark:bg-background/80"
+      className="fixed inset-0 z-20 flex items-center justify-center bg-foreground/70 px-4 dark:bg-background/80"
     >
       <motion.div
         variants={animDialog}
@@ -49,7 +61,7 @@ export default function Modal({ title, toggleModal, children }) {
           variant="ghost"
           size="icon"
           className="absolute right-4 top-4 rounded-full"
-          onClick={toggleModal}
+          onClick={onClose}
         >
           <IoClose />
         </Button>

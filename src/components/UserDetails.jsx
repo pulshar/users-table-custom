@@ -3,10 +3,13 @@ import { capitalize } from "../helpers";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
 import { LoaderCircleIcon } from "lucide-react";
+import useUsersStore from "../store/store";
 
-export default function UserDetails({ data, toggleModal }) {
+export default function UserDetails({ onClose }) {
   const [imgIsLoaded, setImgIsLoaded] = useState(false);
-  const objProperties = Object.keys(data);
+  const userDetails = useUsersStore((state) => state.userDetails);
+
+  const objProperties = Object.keys(userDetails);
   return (
     <>
       <div className="relative mt-3 flex items-center justify-center">
@@ -36,8 +39,7 @@ export default function UserDetails({ data, toggleModal }) {
               <div key={prop} className="p-3 text-sm">
                 <label className="font-semibold">{capitalize(prop)}</label>
                 <p className="text-foreground/60">
-                  {" "}
-                  {data[prop] || "Not provided"}
+                  {userDetails[prop] || "Not provided"}
                 </p>
               </div>
             );
@@ -45,7 +47,7 @@ export default function UserDetails({ data, toggleModal }) {
         })}
       </div>
       <div className="mt-6 flex justify-end space-x-4">
-        <Button variant="muted" onClick={toggleModal}>
+        <Button variant="muted" onClick={onClose}>
           Close
         </Button>
       </div>

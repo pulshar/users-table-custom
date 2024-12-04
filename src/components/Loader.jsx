@@ -1,10 +1,10 @@
 export default function Loader() {
   return (
-    <div className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2">
+    <div className="fixed left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2">
       <div role="status">
         <svg
           aria-hidden="true"
-          className="w-10 h-10 text-foreground/20 animate-spin fill-primary dark:fill-primary"
+          className="h-10 w-10 animate-spin fill-primary text-foreground/20 dark:fill-primary"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

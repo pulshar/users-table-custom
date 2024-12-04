@@ -2,9 +2,13 @@ import { useRef, useState } from "react";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 import { useOnClickOutside } from "../../hooks/useClickOutside";
 import { Input } from "../ui/input";
+import useUsersStore from "../../store/store";
+import { toast } from "@/hooks/use-toast";
+import { capitalize } from "@/helpers/index";
 
-export default function TableCell({ record, column, handleSave }) {
+export default function TableCell({ record, column }) {
   const [editingCell, setEditingCell] = useState({});
+  const updateUser = useUsersStore((state) => state.updateUser);
 
   const cellRef = useRef(null);
   useOnClickOutside(cellRef, () => {
@@ -22,9 +26,15 @@ export default function TableCell({ record, column, handleSave }) {
 
   const handleSaveChange = (e, rowId, field, value) => {
     e.stopPropagation();
-    handleSave(rowId, field, value);
+    updateUser(rowId, field, value);
     handleCancelEditCell();
+    toast({
+      variant: "success",
+      title: "User updated",
+      description: `${capitalize(field)} data was updated successfully.`,
+    });
   };
+
   return (
     <td className="px-4 py-3">
       {editingCell.rowId === record.id && editingCell.field === column.label ? (
@@ -62,14 +72,15 @@ export default function TableCell({ record, column, handleSave }) {
           />
         </div>
       ) : (
-        <span
+        <div
+          title={`Edit ${column.label}`}
           onClick={(e) =>
             handleEditCell(e, record.id, column.label, record[column.label])
           }
-          style={{ cursor: "pointer" }}
+          className={`cursor-pointer ${record[column.label] ? "w-fit" : "h-5 w-16"}`}
         >
-          {record[column.label]}
-        </span>
+          <span>{record[column.label]}</span>
+        </div>
       )}
     </td>
   );

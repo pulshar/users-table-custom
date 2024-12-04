@@ -1,9 +1,3 @@
-Para correr en el servidor, en la terminal:
-
-cd ejercicio
-npm install
-npm run dev
-
 Aplicación de gestión de usuarios.
 En todos los apartados que se describirán a continuación se deberá utilizar el framework escogido. Mostrar una tabla en la que los datos mostrados se recojan directamente del siguiente servicio web:
 https://jsonplaceholder.typicode.com/users

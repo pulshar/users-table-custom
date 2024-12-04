@@ -1,9 +1,19 @@
+
 import { useState } from "react";
 
 export const useModal = () => {
-  const [modal, setModal] = useState(false);
+  const [currentModal, setCurrentModal] = useState(null);
 
-  const toggleModal = () => setModal(!modal);
+  const openModal = (modalName) => setCurrentModal(modalName);
+  const closeModal = () => setCurrentModal(null);
 
-  return { modal, toggleModal };
+  const toggleModal = (modalName) => {
+    if (currentModal === modalName) {
+      closeModal();
+    } else {
+      openModal(modalName);
+    }
+  };
+
+  return { openModal, closeModal, toggleModal, currentModal };
 };

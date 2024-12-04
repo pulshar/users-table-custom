@@ -6,7 +6,7 @@ export default function Pagination({
   setCurrentPage,
 }) {
   return (
-    <div className="flex justify-end rounded-b border border-t-0 p-4">
+    <div className="flex justify-end border-t p-4">
       <Button
         variant="muted"
         size="sm"

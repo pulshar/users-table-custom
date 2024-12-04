@@ -1,28 +1,18 @@
-import { toast } from "react-toastify";
 import TableCell from "./TableCell";
-import { useModal } from "../../hooks/useModal";
 import Modal from "../Modal";
-import { useState } from "react";
 import UserDetails from "../UserDetails";
+import { useModal } from "../../hooks/useModal";
 import { AnimatePresence } from "framer-motion";
+import useUsersStore from "../../store/store";
 
-export default function TableBody({ paginatedData, columns, setTableData }) {
-  const [userData, setUserData] = useState({});
-  // modals
-  const { modal, toggleModal } = useModal();
+export default function TableBody({ paginatedData, columns }) {
+  const setUserDetails = useUsersStore((state) => state.setUserDetails);
 
-  const handleSave = (recordId, field, value) => {
-    setTableData((prevData) =>
-      prevData.map((record) =>
-        record.id === recordId ? { ...record, [field]: value } : record,
-      ),
-    );
-    toast.success("User updated successfully");
-  };
+  const { openModal, closeModal, currentModal } = useModal();
 
   const handleShowUserDetails = (user) => {
-    setUserData(user);
-    toggleModal();
+    setUserDetails(user);
+    openModal("userDetails");
   };
 
   return (
@@ -35,12 +25,7 @@ export default function TableBody({ paginatedData, columns, setTableData }) {
             className="border-t bg-input hover:bg-background/10"
           >
             {columns.map((column) => (
-              <TableCell
-                key={column.label}
-                record={record}
-                column={column}
-                handleSave={handleSave}
-              />
+              <TableCell key={column.label} record={record} column={column} />
             ))}
           </tr>
         ))
@@ -52,9 +37,9 @@ export default function TableBody({ paginatedData, columns, setTableData }) {
         </tr>
       )}
       <AnimatePresence>
-        {modal && (
-          <Modal title="User details" toggleModal={toggleModal}>
-            <UserDetails data={userData} toggleModal={toggleModal} />
+        {currentModal === "userDetails" && (
+          <Modal title="User details" onClose={closeModal}>
+            <UserDetails onClose={closeModal} />
           </Modal>
         )}
       </AnimatePresence>

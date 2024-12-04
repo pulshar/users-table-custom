@@ -1,11 +1,15 @@
 import { SearchIcon, XIcon } from "lucide-react";
 import { Input } from "./ui/input";
+import useUsersStore from "../store/store";
 
-export default function InputSearch({
-  searchTerm,
-  setSearchTerm,
-  handleChange,
-}) {
+export default function InputSearch({ setCurrentPage }) {
+  const searchTerm = useUsersStore((state) => state.searchTerm);
+  const setSearchTerm = useUsersStore((state) => state.setSearchTerm);
+
+  const handleChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
   return (
     <div className="relative flex items-center">
       {!searchTerm ? (

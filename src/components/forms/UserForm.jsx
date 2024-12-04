@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import {
   capitalize,
   checkBirthdayCondition,
@@ -7,6 +6,8 @@ import {
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import useUsersStore from "../../store/store";
+import { toast } from "@/hooks/use-toast";
 
 const initialUserData = {
   name: "",
@@ -19,11 +20,13 @@ const initialUserData = {
   birthday: "",
 };
 
-export default function UserForm({ tableData, setTableData, toggleModal }) {
-  const formFields = Object.keys(initialUserData);
+export default function UserForm({ onClose }) {
+  const usernameExists = useUsersStore((state) => state.usernameExists);
+  const addUser = useUsersStore((state) => state.addUser);
 
+  const formFields = Object.keys(initialUserData);
   const validateUsername = (username) => {
-    if (tableData.some((record) => record.username === username))
+    if (usernameExists(username))
       return `Username '${username}' already exists`;
   };
   const validateEmail = (email) => {
@@ -46,16 +49,20 @@ export default function UserForm({ tableData, setTableData, toggleModal }) {
     let newUser = {};
     if (formData.birthday) {
       const birthday = dateFormatter(formData.birthday);
-      newUser = { id: crypto.randomUUID(), ...formData, birthday };
+      newUser = { ...formData, birthday };
     } else {
-      newUser = { id: crypto.randomUUID(), ...formData };
+      newUser = formData;
     }
 
-    setTableData([...tableData, newUser]);
-    toggleModal();
-    toast.success(
-      `The user ${capitalize(newUser.name)} was added successfully.`,
-    );
+    addUser(newUser);
+    onClose();
+    toast({
+      variant: "success",
+      title: "New user",
+      description: `The user ${capitalize(
+        newUser.name,
+      )} was added successfully.`,
+    });
   };
   return (
     <form onSubmit={(e) => handleSubmit(e, onSubmit)}>
@@ -87,7 +94,7 @@ export default function UserForm({ tableData, setTableData, toggleModal }) {
         <Button
           className="w-full sm:w-auto"
           variant="muted"
-          onClick={toggleModal}
+          onClick={onClose}
           type="button"
         >
           Cancel

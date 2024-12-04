@@ -6,17 +6,19 @@ import InputSearch from "../InputSearch";
 import { usePagination } from "../../hooks/usePagination";
 import Pagination from "../Pagination";
 import Modal from "../Modal";
-import { useModal } from "../../hooks/useModal";
 import UserForm from "../forms/UserForm";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserPlusIcon } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { Button } from "../ui/button";
+import useUsersStore from "../../store/store";
+import { useModal } from "../../hooks/useModal";
 
-export default function Table({ data }) {
-  const [tableData, setTableData] = useLocalStorage("users", data);
-  const [sortedData, setSortedData] = useState(data);
-  const [searchTerm, setSearchTerm] = useState("");
+export default function Table() {
+  const [sortedData, setSortedData] = useState([]);
+  const searchTerm = useUsersStore((state) => state.searchTerm);
+  const data = useUsersStore((state) => state.users);
+
+  const { openModal, closeModal, currentModal } = useModal();
 
   const filteredData = useMemo(() => {
     return sortedData.filter((record) =>
@@ -30,14 +32,11 @@ export default function Table({ data }) {
   const { currentPage, totalPages, paginatedData, setCurrentPage } =
     usePagination({ data: filteredData, itemsPerPage: ITEMS_PER_PAGE });
 
-  // modal
-  const { modal, toggleModal } = useModal();
-
   //sorting
   const handleSorting = useCallback(
     (sortField, sortOrder) => {
       if (sortField && sortOrder) {
-        const sorted = [...tableData].sort((a, b) => {
+        const sorted = [...data].sort((a, b) => {
           const cleanValue = (value) => value.toString().replace("(", "");
 
           const aValue = cleanValue(a[sortField]);
@@ -53,62 +52,45 @@ export default function Table({ data }) {
 
         setSortedData(sorted);
       } else {
-        setSortedData(tableData);
+        setSortedData(data);
       }
       setCurrentPage(1);
     },
-    [setSortedData, tableData, setCurrentPage],
+    [setSortedData, data, setCurrentPage],
   );
 
-  //input search
-  const handleChangeSearchTerm = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  };
-
   useEffect(() => {
-    setSortedData(tableData);
-  }, [tableData]);
+    setSortedData(data);
+  }, [data]);
 
   return (
     <>
       <div className="flex flex-row items-center gap-4 py-4">
-        <InputSearch
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          handleChange={handleChangeSearchTerm}
-        />
-        <Button onClick={toggleModal}>
+        <InputSearch setCurrentPage={setCurrentPage} />
+        <Button onClick={() => openModal("newUser")}>
           <UserPlusIcon className="hidden sm:block" size={16} />
           Add user
         </Button>
       </div>
-
-      <div className="rounded-t border">
-        <div className="relative overflow-auto">
-          <table className="w-full table-auto text-sm">
-            <TableHeader columns={columns} handleSorting={handleSorting} />
-            <TableBody
-              paginatedData={paginatedData}
-              columns={columns}
-              setTableData={setTableData}
-            />
-          </table>
+      {data.length > 0 && (
+        <div className="rounded border">
+          <div className="relative overflow-auto">
+            <table className="w-full table-auto text-sm">
+              <TableHeader columns={columns} handleSorting={handleSorting} />
+              <TableBody paginatedData={paginatedData} columns={columns} />
+            </table>
+          </div>
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
-      </div>
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
+      )}
       <AnimatePresence>
-        {modal && (
-          <Modal title="New user" toggleModal={toggleModal}>
-            <UserForm
-              tableData={tableData}
-              setTableData={setTableData}
-              toggleModal={toggleModal}
-            />
+        {currentModal === "newUser" && (
+          <Modal title="New user" onClose={closeModal}>
+            <UserForm onClose={closeModal} />
           </Modal>
         )}
       </AnimatePresence>
