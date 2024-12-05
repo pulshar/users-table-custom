@@ -65,7 +65,7 @@ export default function Table() {
 
   return (
     <>
-      <div className="flex flex-row items-center gap-4 py-4">
+      <div className="flex items-center gap-4 py-4">
         <InputSearch setCurrentPage={setCurrentPage} />
         <Button onClick={() => openModal("newUser")}>
           <UserPlusIcon className="hidden sm:block" size={16} />

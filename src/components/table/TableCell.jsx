@@ -67,13 +67,13 @@ export default function TableCell({ record, column }) {
                 value: e.target.value,
               })
             }
-            className="h-[26px] min-w-[220px] pl-2 pr-14"
+            className="h-6 min-w-fit pl-2 pr-14"
             autoFocus
           />
         </div>
       ) : (
         <div
-          title={`Edit ${column.label}`}
+          title={`${record[column.label] ? "Edit" : "Add"} ${column.label}`}
           onClick={(e) =>
             handleEditCell(e, record.id, column.label, record[column.label])
           }
