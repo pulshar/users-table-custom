@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { toast } from "@/hooks/use-toast";
 import {
   capitalize,
   checkBirthdayCondition,
@@ -53,9 +53,13 @@ export default function UserForm({ tableData, setTableData, toggleModal }) {
 
     setTableData([...tableData, newUser]);
     toggleModal();
-    toast.success(
-      `The user ${capitalize(newUser.name)} was added successfully.`,
-    );
+    toast({
+      variant: "success",
+      title: "New user",
+      description: `The user ${capitalize(
+        newUser.name,
+      )} was added successfully.`,
+    });
   };
   return (
     <form onSubmit={(e) => handleSubmit(e, onSubmit)}>

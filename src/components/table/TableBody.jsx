@@ -1,10 +1,11 @@
-import { toast } from "react-toastify";
 import TableCell from "./TableCell";
 import { useModal } from "../../hooks/useModal";
 import Modal from "../Modal";
 import { useState } from "react";
 import UserDetails from "../UserDetails";
 import { AnimatePresence } from "framer-motion";
+import { toast } from "@/hooks/use-toast";
+import { capitalize } from "@/helpers/index";
 
 export default function TableBody({ paginatedData, columns, setTableData }) {
   const [userData, setUserData] = useState({});
@@ -17,7 +18,11 @@ export default function TableBody({ paginatedData, columns, setTableData }) {
         record.id === recordId ? { ...record, [field]: value } : record,
       ),
     );
-    toast.success("User updated successfully");
+    toast({
+      variant: "success",
+      title: "User updated",
+      description: `${capitalize(field)} data was updated successfully.`,
+    });
   };
 
   const handleShowUserDetails = (user) => {
