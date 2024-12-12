@@ -11,6 +11,7 @@ export default function TableCell({ record, column }) {
   const updateUser = useUsersStore((state) => state.updateUser);
 
   const cellRef = useRef(null);
+  
   useOnClickOutside(cellRef, () => {
     handleCancelEditCell();
   });
