@@ -28,6 +28,14 @@ export default function TableCell({ record, column }) {
     setInputError("");
     setEditingCell({});
   };
+  useKeyDown(() => {
+    if (editingCell.value) handleCancelEditCell();
+  }, ["Escape"]);
+
+  const resetInputState = () => {
+    setInputError("");
+    setEditingCell({});
+  };
   const handleEditCell = (e, rowId, field, value) => {
     e.stopPropagation();
     setEditingCell({ rowId, field, value });
@@ -35,6 +43,8 @@ export default function TableCell({ record, column }) {
 
   const handleCancelEditCell = (e) => {
     if (e) e.stopPropagation();
+    inputRef.current?.blur();
+    resetInputState();
     inputRef.current?.blur();
     resetInputState();
   };
@@ -63,6 +73,7 @@ export default function TableCell({ record, column }) {
     });
   };
 
+
   return (
     <td className="px-4 py-3">
       {editingCell.rowId === record.id && editingCell.field === column.label ? (
@@ -88,7 +99,12 @@ export default function TableCell({ record, column }) {
           <AnimatePresence>
             {inputError && <TableCellErrorMessage message={inputError} />}
           </AnimatePresence>
+          <AnimatePresence>
+            {inputError && <TableCellErrorMessage message={inputError} />}
+          </AnimatePresence>
           <Input
+            ref={inputRef}
+            type={column.label === "birthday" ? "date" : "text"}
             ref={inputRef}
             type={column.label === "birthday" ? "date" : "text"}
             value={editingCell.value}
@@ -100,17 +116,23 @@ export default function TableCell({ record, column }) {
               })
             }
             className="h-6 min-w-fit pl-2 pr-14"
+            className="h-6 min-w-fit pl-2 pr-14"
             autoFocus
           />
         </div>
       ) : (
         <div
           title={`${record[column.label] ? "Edit" : "Add"} ${column.label}`}
+        <div
+          title={`${record[column.label] ? "Edit" : "Add"} ${column.label}`}
           onClick={(e) =>
             handleEditCell(e, record.id, column.label, record[column.label])
           }
           className={`cursor-pointer transition-colors hover:text-primary ${record[column.label] ? "w-fit" : "h-5 w-16"}`}
+          className={`cursor-pointer transition-colors hover:text-primary ${record[column.label] ? "w-fit" : "h-5 w-16"}`}
         >
+          <span>{record[column.label]}</span>
+        </div>
           <span>{record[column.label]}</span>
         </div>
       )}

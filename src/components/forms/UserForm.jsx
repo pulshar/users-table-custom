@@ -69,9 +69,12 @@ export default function UserForm({ onClose }) {
               <Input
                 onBlur={handleChange}
                 onChange={handleChange}
+                onBlur={handleChange}
+                onChange={handleChange}
                 type={input === "birthday" ? "date" : "text"}
                 id={input}
                 name={input}
+                placeholder={capitalize(input)}
                 placeholder={capitalize(input)}
                 className={`${input === "birthday" ? "block" : ""} ${errors[input] ? "border-red-500" : ""} `}
               />
