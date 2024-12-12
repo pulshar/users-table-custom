@@ -72,7 +72,7 @@ export default function Table({ data }) {
 
   return (
     <>
-      <div className="flex flex-row items-center gap-4 py-4">
+      <div className="flex items-center gap-4 py-4">
         <InputSearch
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -84,7 +84,7 @@ export default function Table({ data }) {
         </Button>
       </div>
 
-      <div className="rounded-t border">
+      <div className="rounded border">
         <div className="relative overflow-auto">
           <table className="w-full table-auto text-sm">
             <TableHeader columns={columns} handleSorting={handleSorting} />
@@ -95,12 +95,12 @@ export default function Table({ data }) {
             />
           </table>
         </div>
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
       <AnimatePresence>
         {modal && (
           <Modal title="New user" toggleModal={toggleModal}>

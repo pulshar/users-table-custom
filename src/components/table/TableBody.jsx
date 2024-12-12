@@ -5,17 +5,27 @@ import { useState } from "react";
 import UserDetails from "../UserDetails";
 import { AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
-import { capitalize } from "@/helpers/index";
+import { capitalize, dateFormatter } from "@/helpers/index";
 
 export default function TableBody({ paginatedData, columns, setTableData }) {
   const [userData, setUserData] = useState({});
-  // modals
+
   const { modal, toggleModal } = useModal();
 
   const handleSave = (recordId, field, value) => {
     setTableData((prevData) =>
       prevData.map((record) =>
-        record.id === recordId ? { ...record, [field]: value } : record,
+        record.id === recordId
+          ? {
+              ...record,
+              [field]:
+                field === "birthday"
+                  ? value.includes("/")
+                    ? value
+                    : dateFormatter(value)
+                  : value,
+            }
+          : record,
       ),
     );
     toast({

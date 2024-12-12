@@ -1,9 +1,10 @@
 import { useRef } from "react";
 import { createPortal } from "react-dom";
-import { useOnClickOutside } from "../hooks/useClickOutside";
-import { IoClose } from "react-icons/io5";
+import { useOnClickOutside } from "@/hooks/useClickOutside";
+import { useKeyDown } from "@/hooks/useKeyDown";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
+import { IoClose } from "react-icons/io5";
 
 const animOverlay = {
   initial: { opacity: 0 },
@@ -28,6 +29,10 @@ export default function Modal({ title, toggleModal, children }) {
   useOnClickOutside(modalRef, () => {
     toggleModal();
   });
+  useKeyDown(() => {
+    toggleModal();
+  }, ["Escape"]);
+
   return createPortal(
     <motion.div
       variants={animOverlay}
