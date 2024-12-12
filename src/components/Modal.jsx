@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { createPortal } from "react-dom";
-import { useOnClickOutside } from "../hooks/useClickOutside";
+import { useOnClickOutside } from "@/hooks/useClickOutside";
+import { useKeyDown } from "@/hooks/useKeyDown";
 import { motion } from "framer-motion";
-import { IoClose } from "react-icons/io5";
 import { Button } from "./ui/button";
+import { IoClose } from "react-icons/io5";
 
 const animOverlay = {
   initial: { opacity: 0 },
@@ -28,17 +29,9 @@ export default function Modal({ title, onClose, children }) {
   useOnClickOutside(modalRef, () => {
     onClose();
   });
-
-  useEffect(() => {
-    const handleEscapeKey = (e) => {
-      if (e.code === "Escape") {
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handleEscapeKey);
-    return () => document.removeEventListener("keydown", handleEscapeKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useKeyDown(() => {
+    onClose();
+  }, ["Escape"]);
 
   return createPortal(
     <motion.div
@@ -47,7 +40,7 @@ export default function Modal({ title, onClose, children }) {
       animate="animate"
       exit="exit"
       role="dialog"
-      className="fixed inset-0 z-20 flex items-center justify-center bg-foreground/70 px-4 dark:bg-background/80"
+      className="fixed inset-0 z-20 flex items-center justify-center bg-foreground/80 px-4 dark:bg-background/80"
     >
       <motion.div
         variants={animDialog}

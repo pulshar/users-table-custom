@@ -63,3 +63,48 @@ export function checkBirthdayCondition(date) {
     return "Birthday cannot be prior to 1920";
   }
 }
+
+export const validateEmail = (email) => {
+  const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const isValid = pattern.test(email);
+  if (!isValid) return `Invalid email`;
+};
+
+const validationRules = {
+  name: {
+    required: true,
+    validator: (value) => (!value ? "Name is required." : ""),
+  },
+  username: {
+    required: true,
+    validator: (value) => (!value ? "Username is required." : ""),
+  },
+  email: {
+    required: false,
+    validator: (value) => {
+      if (value) {
+        const invalidMail = validateEmail(value);
+        return invalidMail || "";
+      }
+      return "";
+    },
+  },
+  birthday: {
+    required: false,
+    validator: (value) => {
+      if (value) {
+        const invalidDate = checkBirthdayCondition(value);
+        return invalidDate || "";
+      }
+      return "";
+    },
+  },
+};
+
+export const validateInput = (field, value) => {
+  const rule = validationRules[field];
+  if (!rule) return "";
+
+  const error = rule.validator(value);
+  return error;
+};

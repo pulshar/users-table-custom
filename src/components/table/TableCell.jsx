@@ -1,20 +1,33 @@
 import { useRef, useState } from "react";
-import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
-import { useOnClickOutside } from "../../hooks/useClickOutside";
-import { Input } from "../ui/input";
-import useUsersStore from "../../store/store";
+import { useOnClickOutside } from "@/hooks/useClickOutside";
+import { useKeyDown } from "@/hooks/useKeyDown";
 import { toast } from "@/hooks/use-toast";
-import { capitalize } from "@/helpers/index";
+import useUsersStore from "../../store/store";
+import { capitalize, dateFormatter, validateInput } from "@/helpers/index";
+import { AnimatePresence } from "framer-motion";
+import TableCellErrorMessage from "./TableCellErrorMessage";
+import { Input } from "../ui/input";
+import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 
 export default function TableCell({ record, column }) {
   const [editingCell, setEditingCell] = useState({});
+  const [inputError, setInputError] = useState("");
   const updateUser = useUsersStore((state) => state.updateUser);
 
   const cellRef = useRef(null);
-  
+  const inputRef = useRef(null);
+
   useOnClickOutside(cellRef, () => {
     handleCancelEditCell();
   });
+  useKeyDown(() => {
+    if (editingCell.value) handleCancelEditCell();
+  }, ["Escape"]);
+
+  const resetInputState = () => {
+    setInputError("");
+    setEditingCell({});
+  };
   const handleEditCell = (e, rowId, field, value) => {
     e.stopPropagation();
     setEditingCell({ rowId, field, value });
@@ -22,12 +35,26 @@ export default function TableCell({ record, column }) {
 
   const handleCancelEditCell = (e) => {
     if (e) e.stopPropagation();
-    setEditingCell({});
+    inputRef.current?.blur();
+    resetInputState();
   };
-
   const handleSaveChange = (e, rowId, field, value) => {
     e.stopPropagation();
-    updateUser(rowId, field, value);
+    const error = validateInput(field, value);
+    if (error) {
+      inputRef.current?.focus();
+      setInputError(error);
+      setTimeout(() => setInputError(""), 3000);
+      return;
+    }
+    const defValue =
+      field === "birthday"
+        ? value.includes("/")
+          ? value
+          : dateFormatter(value)
+        : value;
+
+    updateUser(rowId, field, defValue);
     handleCancelEditCell();
     toast({
       variant: "success",
@@ -58,8 +85,12 @@ export default function TableCell({ record, column }) {
               />
             </button>
           </div>
+          <AnimatePresence>
+            {inputError && <TableCellErrorMessage message={inputError} />}
+          </AnimatePresence>
           <Input
-            type="text"
+            ref={inputRef}
+            type={column.label === "birthday" ? "date" : "text"}
             value={editingCell.value}
             onClick={(e) => e.stopPropagation()}
             onChange={(e) =>
@@ -78,7 +109,7 @@ export default function TableCell({ record, column }) {
           onClick={(e) =>
             handleEditCell(e, record.id, column.label, record[column.label])
           }
-          className={`cursor-pointer ${record[column.label] ? "w-fit" : "h-5 w-16"}`}
+          className={`cursor-pointer transition-colors hover:text-primary ${record[column.label] ? "w-fit" : "h-5 w-16"}`}
         >
           <span>{record[column.label]}</span>
         </div>

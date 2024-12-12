@@ -1,13 +1,10 @@
-import {
-  capitalize,
-  checkBirthdayCondition,
-  dateFormatter,
-} from "../../helpers";
+import { toast } from "@/hooks/use-toast";
+import { capitalize, dateFormatter, validateInput } from "../../helpers";
 import { useFormValidation } from "../../hooks/useFormValidation";
+import useUsersStore from "../../store/store";
+
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import useUsersStore from "../../store/store";
-import { toast } from "@/hooks/use-toast";
 
 const initialUserData = {
   name: "",
@@ -23,23 +20,19 @@ const initialUserData = {
 export default function UserForm({ onClose }) {
   const usernameExists = useUsersStore((state) => state.usernameExists);
   const addUser = useUsersStore((state) => state.addUser);
-
   const formFields = Object.keys(initialUserData);
+
   const validateUsername = (username) => {
     if (usernameExists(username))
       return `Username '${username}' already exists`;
   };
-  const validateEmail = (email) => {
-    const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const isValid = pattern.test(email);
-    if (!isValid) return `Invalid email address`;
-  };
-  const validate = (inputName, value) => {
-    if ((inputName === "name" || inputName === "username") && !value)
-      return `${inputName} is required.`;
-    if (inputName === "username" && value) return validateUsername(value);
-    if (inputName === "email" && value) return validateEmail(value);
-    if (inputName === "birthday" && value) return checkBirthdayCondition(value);
+
+  const validate = (field, value) => {
+    if (field === "username" && value) return validateUsername(value);
+    const error = validateInput(field, value);
+    if (error) {
+      return error;
+    }
   };
   const { formData, errors, handleChange, handleSubmit } = useFormValidation(
     initialUserData,
@@ -74,11 +67,12 @@ export default function UserForm({ onClose }) {
                 {capitalize(input)}
               </label>
               <Input
+                onBlur={handleChange}
+                onChange={handleChange}
                 type={input === "birthday" ? "date" : "text"}
                 id={input}
                 name={input}
-                onChange={handleChange}
-                onBlur={handleChange}
+                placeholder={capitalize(input)}
                 className={`${input === "birthday" ? "block" : ""} ${errors[input] ? "border-red-500" : ""} `}
               />
               {errors[input] && (
