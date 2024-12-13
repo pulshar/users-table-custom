@@ -2,11 +2,8 @@ import { useRef } from "react";
 import { createPortal } from "react-dom";
 import { useOnClickOutside } from "@/hooks/useClickOutside";
 import { useKeyDown } from "@/hooks/useKeyDown";
-import { useOnClickOutside } from "@/hooks/useClickOutside";
-import { useKeyDown } from "@/hooks/useKeyDown";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { IoClose } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 
 const animOverlay = {
